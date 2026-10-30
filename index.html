@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Laboratorio dei Legami Chimici</title>
+<title>KimiKlab — Laboratorio dei legami chimici</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -38,6 +38,7 @@
   --electron: #ca8a04;
   --heat-lo: #bae6fd;
   --heat-hi: #fb923c;
+  --heat-ink: #1c1917;
   --shadow: 0 10px 30px rgba(15, 23, 42, .08);
   color-scheme: light;
   box-sizing: border-box;
@@ -61,8 +62,8 @@
     --metal: #f87171;
     --nonmetal: #60a5fa;
     --semi: #c084fc;
-  --noble: #2dd4bf;
-  --radio: #a3e635;
+    --noble: #2dd4bf;
+    --radio: #a3e635;
     --ionic: #fb7185;
     --polar: #22d3ee;
     --apolar: #34d399;
@@ -114,10 +115,10 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: 100%;
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg);
   background-image:
@@ -132,7 +133,7 @@ body {
 }
 h1, h2, h3, .heading { font-family: 'Outfit', 'Inter', system-ui, sans-serif; margin: 0; }
 button { font: inherit; color: inherit; cursor: pointer; }
-button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+button:focus-visible, [tabindex]:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .hidden { display: none !important; }
 
@@ -150,6 +151,7 @@ header.top {
 .brand-logo svg { width: 26px; height: 26px; animation: spin 14s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .brand h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -.01em; }
+.brand h1 .k2 { color: var(--accent); }
 .brand p { margin: 0; font-size: .78rem; color: var(--muted); }
 .tabs { display: inline-flex; padding: 4px; gap: 4px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); }
 .tab {
@@ -257,12 +259,13 @@ main { max-width: 1200px; width: 100%; margin: 0 auto; padding: 8px 16px 28px; f
 .badge.k-polare { background: color-mix(in srgb, var(--polar) 16%, transparent); color: var(--polar); border-color: color-mix(in srgb, var(--polar) 50%, transparent); }
 .badge.k-apolare { background: color-mix(in srgb, var(--apolar) 16%, transparent); color: var(--apolar); border-color: color-mix(in srgb, var(--apolar) 50%, transparent); }
 .badge.k-metallico { background: color-mix(in srgb, var(--metallic) 16%, transparent); color: var(--metallic); border-color: color-mix(in srgb, var(--metallic) 50%, transparent); }
+.badge.k-nobile { background: color-mix(in srgb, var(--noble) 16%, transparent); color: var(--noble); border-color: color-mix(in srgb, var(--noble) 50%, transparent); }
 
 .stage { position: relative; height: 300px; border-radius: 16px; overflow: hidden; background: var(--canvas-bg); border: 1px solid var(--border); }
 @media (max-width: 560px) { .stage { height: 260px; } }
 .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.placeholder { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 22px; color: var(--muted); font-size: .88rem; }
-.placeholder svg { width: 40px; height: 40px; opacity: .45; display: block; margin: 0 auto 8px; }
+.stage-empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 22px; color: var(--muted); font-size: .88rem; }
+.stage-empty svg { width: 40px; height: 40px; opacity: .45; display: block; margin: 0 auto 8px; }
 .stage-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
 .legend { margin-left: auto; font-size: .72rem; color: var(--muted); }
 
@@ -306,19 +309,25 @@ main { max-width: 1200px; width: 100%; margin: 0 auto; padding: 8px 16px 28px; f
 .el.nonmetallo { --c: var(--nonmetal); }
 .el.semimetallo { --c: var(--semi); }
 .el.nobile { --c: var(--noble); }
-.ptable.heat .el.noen { background: var(--surface-3); }
 .ptable.heat .el { background: color-mix(in srgb, var(--heat-hi) var(--heat), var(--heat-lo)); border-color: color-mix(in srgb, var(--c) 70%, transparent); }
+.ptable.heat .el.noen { background: var(--surface-3); }
 .el:hover { transform: translateY(-2px); border-color: var(--c); box-shadow: 0 6px 16px color-mix(in srgb, var(--c) 30%, transparent); }
 .el.sel { box-shadow: 0 0 0 3px var(--accent); transform: scale(1.04); }
 .el .top { width: 100%; display: flex; justify-content: space-between; font-size: .58rem; color: var(--muted); padding: 0 2px; font-variant-numeric: tabular-nums; }
 .ptable.heat .el .top { color: var(--text); opacity: .8; }
 .el .sy { font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800; line-height: 1; color: var(--c); }
 .ptable.heat .el .sy { color: var(--text); }
+.ptable.heat .el.hot .sy, .ptable.heat .el.hot .top, .ptable.heat .el.hot .nm { color: var(--heat-ink); opacity: 1; }
 .el .nm { font-size: .5rem; opacity: .85; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.el.radio::after { content: ''; position: absolute; right: 5px; bottom: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--radio); box-shadow: 0 0 7px 2px var(--radio); animation: rpulse 2s ease-in-out infinite; }
+@keyframes rpulse { 0%, 100% { opacity: .55; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.15); } }
+.el-gap {
+  border: 1.5px dashed var(--border); border-radius: 12px; min-height: 60px; display: grid; place-items: center;
+  color: var(--muted); font-size: .58rem; font-variant-numeric: tabular-nums;
+}
+.fl { font-size: .66rem; color: var(--muted); align-self: center; font-weight: 600; }
 .trend { margin: 10px 0 0; text-align: center; font-size: .74rem; color: var(--muted); }
 
-
-.badge.k-nobile { background: color-mix(in srgb, var(--noble) 16%, transparent); color: var(--noble); border-color: color-mix(in srgb, var(--noble) 50%, transparent); }
 .btn-small:disabled { opacity: .4; cursor: default; }
 .lewis-box { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: var(--accent-soft); border: 1px solid var(--accent); font-size: .86rem; }
 .lw-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
@@ -340,11 +349,6 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: .84rem; min-width
 .cmp td.diff { background: var(--accent-soft); }
 .cmp sub, .cmp sup { font-size: .7em; }
 
-
-.el.radio::after { content: ''; position: absolute; right: 5px; bottom: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--radio); box-shadow: 0 0 7px 2px var(--radio); animation: rpulse 2s ease-in-out infinite; }
-@keyframes rpulse { 0%, 100% { opacity: .55; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.15); } }
-.el.placeholder { border-style: dashed; background: transparent; color: var(--muted); font-size: .58rem; display: grid; place-items: center; cursor: default; min-height: 60px; }
-.fl { font-size: .66rem; color: var(--muted); align-self: center; font-weight: 600; }
 .chip.radio { border-style: dashed; border-color: var(--radio); }
 .chip.radio::before { content: '\2622\00a0'; color: var(--radio); }
 .same-row { margin-top: 10px; }
@@ -423,20 +427,20 @@ footer { text-align: center; padding: 16px; font-size: .76rem; color: var(--mute
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="1.8" fill="#fff"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>
     </div>
     <div>
-      <h1>BondLab 360°</h1>
+      <h1>Kimi<span class="k2">K</span>lab</h1>
       <p>Esplora e simula i legami chimici</p>
     </div>
   </div>
   <div class="tabs" role="tablist" aria-label="Sezioni">
-    <button class="tab" id="tab-lab" role="tab" aria-selected="true" aria-controls="sec-lab">
+    <button class="tab" id="tab-lab" role="tab" aria-selected="true" aria-controls="sec-lab" tabindex="0">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.3L4.5 19a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9.3V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>
       Laboratorio
     </button>
-    <button class="tab" id="tab-quiz" role="tab" aria-selected="false" aria-controls="sec-quiz">
+    <button class="tab" id="tab-quiz" role="tab" aria-selected="false" aria-controls="sec-quiz" tabindex="-1">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.7V17c0 .6-.5 1-1.1 1.2C7.8 18.8 7 20.2 7 22"/><path d="M14 14.7V17c0 .6.5 1 1.1 1.2 1.1.6 1.9 2 1.9 3.8"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
       Sfida Quiz
     </button>
-    <button class="tab" id="tab-cmp" role="tab" aria-selected="false" aria-controls="sec-cmp">
+    <button class="tab" id="tab-cmp" role="tab" aria-selected="false" aria-controls="sec-cmp" tabindex="-1">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/></svg>
       Confronto
     </button>
@@ -512,7 +516,7 @@ footer { text-align: center; padding: 16px; font-size: .76rem; color: var(--mute
 
         <div class="stage" id="stage">
           <canvas id="bondCanvas" role="img" aria-label="Animazione del legame chimico tra gli elementi scelti"></canvas>
-          <div class="placeholder" id="placeholder">
+          <div class="stage-empty" id="placeholder">
             <div>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>
               Scegli due elementi per vedere la struttura microscopica del legame.
@@ -574,7 +578,7 @@ footer { text-align: center; padding: 16px; font-size: .76rem; color: var(--mute
       <div class="quiz-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
       </div>
-      <h2>Sfida dei Legami Chimici</h2>
+      <h2>Sfida dei legami chimici</h2>
       <p class="sub">Cinque domande pescate a caso da un archivio più ampio. Dopo ogni risposta puoi verificare il caso nel laboratorio.</p>
 
       <div class="chips" id="quiz-levels" role="group" aria-label="Difficoltà" style="justify-content:center;margin-bottom:14px">
@@ -601,6 +605,7 @@ footer { text-align: center; padding: 16px; font-size: .76rem; color: var(--mute
       </div>
     </div>
   </section>
+
   <!-- ================= CONFRONTO ================= -->
   <section id="sec-cmp" class="hidden" role="tabpanel" aria-labelledby="tab-cmp">
     <div class="cmp-grid">
@@ -628,13 +633,13 @@ footer { text-align: center; padding: 16px; font-size: .76rem; color: var(--mute
   </section>
 </main>
 
-<footer>BondLab 360° &bull; Applicazione didattica interattiva per la chimica &bull; Le formule dei composti sono quelle tipiche, a scopo illustrativo.</footer>
+<footer>KimiKlab &bull; Applicazione didattica interattiva per la chimica &bull; Le formule dei composti sono quelle tipiche, a scopo illustrativo.</footer>
 
 <script>
 'use strict';
 
 /* =====================================================================
-   DATI: elementi da 1 (H) a 54 (Xe)
+   DATI: elementi da 1 (H) a 94 (Pu)
    ===================================================================== */
 // type: m metallo · n non metallo · s semimetallo · g gas nobile
 // ve = elettroni di valenza · cov = covalenza tipica · cation/anion = carica tipica dello ione
@@ -747,7 +752,7 @@ const PRESETS = [
   ['Na', 'Cl', 'NaCl'], ['Mg', 'O', 'MgO'], ['Ca', 'F', 'CaF₂'], ['Al', 'O', 'Al₂O₃'], ['K', 'F', 'KF'],
   ['H', 'O', 'H₂O'], ['C', 'O', 'CO₂'], ['O', 'O', 'O₂'], ['N', 'N', 'N₂'], ['H', 'Cl', 'HCl'], ['H', 'F', 'HF'],
   ['C', 'H', 'CH₄'], ['P', 'H', 'PH₃'], ['B', 'F', 'BF₃'], ['S', 'F', 'SF₆'], ['Xe', 'F', 'XeF₂'],
-  ['Fe', 'Cu', 'Fe + Cu'], ['He', 'Ne', 'He + Ne'], ['S', 'S', 'S₈'], ['P', 'P', 'P₄'],
+  ['Fe', 'Cu', 'Fe + Cu'], ['Ga', 'As', 'GaAs'], ['He', 'Ne', 'He + Ne'], ['S', 'S', 'S₈'], ['P', 'P', 'P₄'],
   ['Pu', 'Pu', 'Pu', 'r'], ['Pu', 'O', 'PuO₂', 'r'], ['U', 'F', 'UF₄', 'r'], ['Ra', 'Cl', 'RaCl₂', 'r'], ['At', 'At', 'At₂', 'r'], ['Rn', 'Rn', 'Rn', 'r']
 ];
 
@@ -792,6 +797,12 @@ const OVERRIDES = {
   'C-N': { two: true, order: 3 },
   'N-O': { two: true, order: 2, stubs: [0, 0] }
 };
+
+// Soglia minima di ΔE perché metallo + non metallo venga trattato come ionico
+const IONIC_MIN_DE = 0.8;
+// Semiconduttori III-V: metallo del gruppo 13 con P, As o Sb
+const III_V_METALS = ['Al', 'Ga', 'In'];
+const III_V_PARTNERS = ['P', 'As', 'Sb'];
 
 /* =====================================================================
    FUNZIONI DI SUPPORTO
@@ -847,10 +858,30 @@ function analyzeRaw(a, b) {
   if (metals.length === 1) {
     const m = metals[0];
     const o = a === m ? b : a;
-    if (o.type === 'nonmetallo' || (o.type === 'semimetallo' && o.anion && dE > 0.4)) return buildIonic(m, o, dE, ionicPct);
-    if (dE <= 0.4) return { kind: 'metallico', a, b, dE, ionicPct, alloy: true, semiEl: o };
+
+    // Semiconduttori III-V (GaAs, InP, AlSb…): reticolo covalente tetraedrico
+    if (III_V_METALS.includes(m.symbol) && III_V_PARTNERS.includes(o.symbol)) {
+      const mol = buildMolecule(a, b, dE);
+      mol.parts = [{ s: m.symbol, n: 1 }, { s: o.symbol, n: 1 }];
+      mol.key = formulaKey(mol.parts);
+      mol.name = ANION_NAME[o.symbol] + ' di ' + CATION_NAME[m.symbol];
+      mol.network = true;
+      mol.semicond = true;
+      return { kind: dE > 0.4 ? 'polare' : 'apolare', a, b, dE, ionicPct, mol, semicond: { m, o } };
+    }
+
+    // Ionico solo se l’altro atomo forma anioni, è davvero più elettronegativo del metallo
+    // e la differenza è abbastanza grande da trasferire elettroni
+    const canAnion = o.anion && (o.type === 'nonmetallo' || o.type === 'semimetallo');
+    if (canAnion && o.en > m.en && dE >= IONIC_MIN_DE) return buildIonic(m, o, dE, ionicPct);
+
+    if (o.type === 'semimetallo' && dE <= 0.4) return { kind: 'metallico', a, b, dE, ionicPct, alloy: true, semiEl: o };
+
     const mol = buildMolecule(a, b, dE);
-    return { kind: 'polare', a, b, dE, ionicPct, mol, semiEl: o };
+    const res = { kind: dE > 0.4 ? 'polare' : 'apolare', a, b, dE, ionicPct, mol };
+    if (o.type === 'semimetallo') res.semiEl = o;
+    else res.mixed = { m, o, metalMore: m.en >= o.en };
+    return res;
   }
   const mol = buildMolecule(a, b, dE);
   return { kind: dE > 0.4 ? 'polare' : 'apolare', a, b, dE, ionicPct, mol };
@@ -1052,9 +1083,10 @@ function explainBase(r) {
 
   if (r.kind === 'ionico') {
     const { metal: m, nonmetal: x, qc, qa, nc, na, dE } = r;
-    out.push(`<p><strong>Il trasferimento di elettroni.</strong> ${x.name} è molto più elettronegativo di ${lc(m.name)} (ΔE = ${fmt(dE)}), quindi gli elettroni di valenza passano al non metallo. ${nc} ${pluralize(nc, 'atomo', 'atomi')} di ${lc(m.name)} ${pluralize(nc, 'cede', 'cedono')} ${qc} ${pluralize(qc, 'elettrone', 'elettroni')} ciascuno; ${na} ${pluralize(na, 'atomo', 'atomi')} di ${lc(x.name)} ne ${pluralize(na, 'acquista', 'acquistano')} ${qa} ciascuno.</p>`);
+    const how = dE >= 1.5 ? 'molto più elettronegativo' : 'più elettronegativo';
+    out.push(`<p><strong>Il trasferimento di elettroni.</strong> ${x.name} è ${how} di ${lc(m.name)} (ΔE = ${fmt(dE)}), quindi gli elettroni di valenza passano al non metallo. ${nc} ${pluralize(nc, 'atomo', 'atomi')} di ${lc(m.name)} ${pluralize(nc, 'cede', 'cedono')} ${qc} ${pluralize(qc, 'elettrone', 'elettroni')} ciascuno; ${na} ${pluralize(na, 'atomo', 'atomi')} di ${lc(x.name)} ne ${pluralize(na, 'acquista', 'acquistano')} ${qa} ciascuno.</p>`);
     out.push(`<p>Si formano gli ioni ${ionHTML(m.symbol, qc, '+')} (catione, più piccolo dell’atomo di partenza) e ${ionHTML(x.symbol, qa, MINUS)} (anione, più grande). Cariche opposte si attraggono e gli ioni si dispongono in un reticolo cristallino. La formula ${formulaHTML(r.parts)} esprime il rapporto che bilancia le cariche: ${nc} × (+${qc}) = ${na} × (${MINUS}${qa}).</p>`);
-    if (dE < 1.9) out.push(`<p class="note">ΔE è sotto 1,9: trattandosi di metallo + non metallo il legame resta ionico, ma con un parziale carattere covalente.</p>`);
+    if (dE < 1.9) out.push(`<p class="note">ΔE è sotto 1,9: trattandosi di metallo + non metallo il legame si descrive come ionico, ma con un parziale carattere covalente${dE < 1.2 ? ' piuttosto marcato' : ''}.</p>`);
     if (m.cationNote) out.push(`<p class="note">${m.cationNote}</p>`);
     else if (m.multi) out.push(`<p class="note">Il ${lc(m.name)} ha più stati di ossidazione: qui è mostrato ${ionHTML(m.symbol, qc, '+')}, uno dei più comuni. La formula è indicativa.</p>`);
     if (x.anionNote) out.push(`<p class="note">${x.anionNote}</p>`);
@@ -1073,9 +1105,16 @@ function explainBase(r) {
     out.push(`<p><strong>Condivisione quasi equa.</strong> ΔE = ${fmt(r.dE)} è minore di 0,4: gli elettroni sono condivisi in modo praticamente simmetrico e non compaiono cariche parziali apprezzabili.</p>`);
   }
 
+  if (r.mixed) {
+    const { m: mt, o } = r.mixed;
+    out.push(`<p class="note"><strong>Metallo + non metallo, ma non ionico.</strong> ${cap(lc(mt.name))} e ${lc(o.name)} hanno elettronegatività troppo vicine (ΔE = ${fmt(r.dE)}) perché gli elettroni passino davvero da un atomo all’altro: il legame è prevalentemente covalente.${r.mixed.metalMore ? ` Qui è addirittura il metallo (${mt.symbol}) l’atomo più elettronegativo.` : ''} Composti come questi sono di solito solidi con legami intermedi, spesso semiconduttori o dall’aspetto metallico, non sali tipici. Qui è mostrata una sola coppia di atomi.</p>`);
+  }
+
   if (m.parts) {
     let line = `<p><strong>${formulaHTML(m.parts)}</strong>${m.name ? ' — ' + m.name : ''}. `;
-    if (m.two) {
+    if (m.semicond) {
+      line += `Ogni atomo di ${lc(r.semicond.m.name)} è legato a quattro atomi di ${lc(r.semicond.o.name)} disposti a tetraedro, e viceversa: è la stessa struttura del diamante e del silicio. Nel disegno è mostrato un solo legame dell’unità che si ripete.`;
+    } else if (m.two) {
       line += `Tra i due atomi c’è un legame <strong>${bondName[m.order]}</strong> (${m.order} ${pluralize(m.order, 'coppia condivisa', 'coppie condivise')}).`;
       const stubs = m.sa + m.sb;
       const sym = m.center.symbol;
@@ -1093,7 +1132,8 @@ function explainBase(r) {
     out.push(line);
     if (!m.two && r.kind === 'polare' && m.symmetric) out.push(`<p class="note">I legami sono polari, ma la forma simmetrica fa sì che i dipoli si annullino a vicenda: la molecola nel suo insieme è apolare.</p>`);
     if (!m.two && r.kind === 'polare' && !m.symmetric) out.push(`<p class="note">La forma non simmetrica impedisce ai dipoli di annullarsi: la molecola ha un polo negativo e uno positivo.</p>`);
-    if (m.network) out.push(`<p class="note">Nella realtà questa sostanza forma un reticolo covalente continuo (non molecole isolate): è dura e ha un punto di fusione molto alto.</p>`);
+    if (m.semicond) out.push(`<p class="note"><strong>Semiconduttore III-V.</strong> Un metallo del gruppo 13 e un elemento del gruppo 15 mettono in comune in media 4 elettroni per atomo, come il silicio. Anche se uno dei due è un metallo, il legame è covalente: questi materiali si usano in LED, laser e celle solari.</p>`);
+    else if (m.network) out.push(`<p class="note">Nella realtà questa sostanza forma un reticolo covalente continuo (non molecole isolate): è dura e ha un punto di fusione molto alto.</p>`);
     if (m.fallback) out.push(`<p class="note">Formula bruta indicativa: nel disegno è mostrato un singolo legame dell’unità che si ripete.</p>`);
     if (m.exotic) out.push(`<p class="note">Il ${lc(m.center.name)} è un gas nobile, ma i suoi atomi grandi e poco trattenuti possono legarsi al fluoro, molto elettronegativo. Il centro ospita più di 8 elettroni (ottetto espanso).</p>`);
   } else if (r.semiEl) {
@@ -1107,7 +1147,7 @@ function explainBase(r) {
 }
 
 function hbondCapable(r) {
-  if (!r || r.kind !== 'polare' || !r.mol || !r.mol.parts) return false;
+  if (!r || r.kind !== 'polare' || !r.mol || !r.mol.parts || r.mol.network) return false;
   const m = r.mol, XS = ['N', 'O', 'F'];
   if (m.two) return [r.a, r.b].some(e => e.symbol === 'H') && [r.a, r.b].some(e => XS.includes(e.symbol));
   return m.outer.symbol === 'H' && XS.includes(m.center.symbol);
@@ -1118,7 +1158,7 @@ function headParts(r) {
   if (r.kind === 'metallico') return { f: r.a.symbol === r.b.symbol ? r.a.symbol : r.a.symbol + '–' + r.b.symbol, n: r.alloy ? 'Lega' : 'Metallo' };
   if (r.kind === 'nobile') return { f: r.a.symbol + (r.a !== r.b ? ' · ' + r.b.symbol : ''), n: r.a === r.b ? 'Gas monoatomico' : 'Nessun composto' };
   if (r.mol.parts) return { f: formulaHTML(r.mol.parts), n: r.mol.name || '' };
-  return { f: r.a.symbol + '–' + r.b.symbol, n: '' };
+  return { f: r.a.symbol + '–' + r.b.symbol, n: r.mixed ? 'Legame prevalentemente covalente' : '' };
 }
 
 function statsFor(r) {
@@ -1144,6 +1184,12 @@ function statsBase(r) {
     s.push(['Struttura', 'Reticolo ionico']);
   } else {
     const m = r.mol;
+    if (m.semicond) {
+      s.push(['Legami per atomo', '4 (tetraedrici)']);
+      s.push(['Struttura', 'Reticolo covalente']);
+      s.push(['Materiale', 'Semiconduttore']);
+      return s;
+    }
     if (m.two) {
       s.push(['Legame', bondName[m.order] || String(m.order)]);
       s.push(['Geometria', 'Lineare (due atomi)']);
@@ -1152,7 +1198,7 @@ function statsBase(r) {
       s.push(['Legami', `${m.n} ${m.n > 1 ? w[1] : w[0]}`]);
       s.push(['Geometria', cap(m.geometry)]);
     }
-    s.push(['Polarità molecola', cap(m.polarity)]);
+    s.push([r.mixed || r.semiEl ? 'Polarità del legame' : 'Polarità molecola', cap(m.polarity)]);
   }
   return s;
 }
@@ -1168,6 +1214,8 @@ function propsBase(r) {
   if (r.kind === 'metallico') return ['Lucentezza metallica', 'Ottimi conduttori di calore ed elettricità', 'Malleabili e duttili'];
   if (r.kind === 'ionico') return ['Solidi cristallini', 'Punto di fusione alto', 'Fragili', 'Conducono se fusi o sciolti in acqua'];
   const m = r.mol;
+  if (m.semicond) return ['Reticolo covalente', 'Semiconduttore', 'Duro e fragile', 'Usato in LED e celle solari'];
+  if (r.mixed || r.semiEl) return ['Solido a temperatura ambiente', 'Legame intermedio tra covalente e ionico', 'Spesso semiconduttore o dall’aspetto metallico'];
   if (m.network) return ['Reticolo covalente continuo', 'Molto duri', 'Punto di fusione molto alto'];
   return ['Molecole discrete', 'Punto di fusione basso', 'Non conducono da soli',
     /polare|debolmente/.test(m.polarity) && !/apolare/.test(m.polarity) ? 'Tendono a sciogliersi in acqua' : 'Poco solubili in acqua'];
@@ -1272,7 +1320,6 @@ function valenceDots(x, y, r, count, color, pairFirst) {
   }
 }
 
-
 /* ---------------- Radioattività ---------------- */
 function hexRGB(h) { const m = /^#?([0-9a-f]{6})$/i.exec((h || '').trim()); if (!m) return [132, 204, 22]; const n = parseInt(m[1], 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 function rgba(h, a) { const c = hexRGB(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
@@ -1352,10 +1399,23 @@ function drawIonic(t) {
   const T0 = 0.16, T1 = 0.62, DUR = 0.2;
   const total = r.nc * r.qc;
 
-  const top = 40, bot = H - 14;
-  const yAt = (i, n) => top + (bot - top) * (i + 1) / (n + 1);
+  const top = 40, bot = H - 14, spanH = bot - top;
+  const yAt = (i, n) => top + spanH * (i + 1) / (n + 1);
   const xc = W * 0.27, xa = W * 0.73;
-  const rc0 = atomRadius(r.metal, s) * 1.05, ra0 = atomRadius(r.nonmetal, s) * 1.05;
+  const ANION_GROW = 1.28, CATION_SHRINK = 0.68;
+
+  // Con 3 o più ioni nella stessa colonna li disponiamo a zig-zag
+  // e limitiamo il raggio perché non si sovrappongano
+  const zig = n => n >= 3;
+  const limR = (n, grow) => {
+    const sp = spanH / (n + 1);
+    const byH = (zig(n) ? sp * 0.95 : sp * 0.48) / grow;
+    return zig(n) ? Math.min(byH, W * 0.1 / grow) : byH;
+  };
+  const rc0 = Math.min(atomRadius(r.metal, s) * 1.05, limR(r.nc, 1));
+  const ra0 = Math.min(atomRadius(r.nonmetal, s) * 1.05, limR(r.na, ANION_GROW));
+  const cxAt = i => xc + (zig(r.nc) ? (i % 2 ? 1 : -1) * rc0 * 0.95 : 0);
+  const axAt = j => xa + (zig(r.na) ? (j % 2 ? 1 : -1) * ra0 * ANION_GROW * 0.95 : 0);
 
   const el = [];
   for (let k = 0; k < total; k++) {
@@ -1370,10 +1430,11 @@ function drawIonic(t) {
   };
 
   const cats = [], ans = [];
-  for (let i = 0; i < r.nc; i++) cats.push({ y: yAt(i, r.nc), f: frac(i, true) });
-  for (let j = 0; j < r.na; j++) ans.push({ y: yAt(j, r.na), f: frac(j, false) });
-  const cr = c => lerp(rc0, rc0 * 0.68, c.f);
-  const ar = a => lerp(ra0, ra0 * 1.28, a.f);
+  for (let i = 0; i < r.nc; i++) cats.push({ x: cxAt(i), y: yAt(i, r.nc), f: frac(i, true) });
+  for (let j = 0; j < r.na; j++) ans.push({ x: axAt(j), y: yAt(j, r.na), f: frac(j, false) });
+  const cr = c => lerp(rc0, rc0 * CATION_SHRINK, c.f);
+  const ar = a => lerp(ra0, ra0 * ANION_GROW, a.f);
+  const fs = rad => Math.max(10, Math.min(16 * Math.max(.85, s), rad * 0.95));
   const done = ph > T1 + 0.01;
 
   if (done) {
@@ -1381,33 +1442,34 @@ function drawIonic(t) {
     ctx.setLineDash([5, 5]); ctx.lineDashOffset = -t * 18; ctx.lineWidth = 2;
     ctx.strokeStyle = C.ionic; ctx.globalAlpha = .3 + .25 * Math.sin(t * 3);
     cats.forEach(c => ans.forEach(a => {
-      ctx.beginPath(); ctx.moveTo(xc + cr(c) + 4, c.y); ctx.lineTo(xa - ar(a) - 4, a.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(c.x + cr(c) + 4, c.y); ctx.lineTo(a.x - ar(a) - 4, a.y); ctx.stroke();
     }));
     ctx.restore();
   }
 
   cats.forEach((c, i) => {
-    radioHalo(xc, c.y, cr(c), r.metal, t, i + 1);
-    circle(xc, c.y, cr(c), C.metal);
-    symbolWithCharge(r.metal.symbol, done ? chargeText(r.qc, '+') : '', xc, c.y, 16 * Math.max(.85, s), C.ink);
+    radioHalo(c.x, c.y, cr(c), r.metal, t, i + 1);
+    circle(c.x, c.y, cr(c), C.metal);
+    symbolWithCharge(r.metal.symbol, done ? chargeText(r.qc, '+') : '', c.x, c.y, fs(cr(c)), C.ink);
   });
   ans.forEach((a, i) => {
-    radioHalo(xa, a.y, ar(a), r.nonmetal, t, i + 11);
-    circle(xa, a.y, ar(a), typeColor(r.nonmetal));
-    symbolWithCharge(r.nonmetal.symbol, done ? chargeText(r.qa, MINUS) : '', xa, a.y, 16 * Math.max(.85, s), C.ink);
+    radioHalo(a.x, a.y, ar(a), r.nonmetal, t, i + 11);
+    circle(a.x, a.y, ar(a), typeColor(r.nonmetal));
+    symbolWithCharge(r.nonmetal.symbol, done ? chargeText(r.qa, MINUS) : '', a.x, a.y, fs(ar(a)), C.ink);
   });
 
+  const spread = Math.min(11, rc0 * 0.6);
   el.forEach(e => {
     const c = cats[e.ci], a = ans[e.ai];
-    const sy = c.y + (e.kc - (r.qc - 1) / 2) * 11;
-    const ey = a.y + (e.ka - (r.qa - 1) / 2) * 11;
-    const sx = xc + cr(c) * (e.p < 1 ? 1 : 0.68) * 0.98;
-    const ex = xa - ar(a) * 0.98;
+    const sy = c.y + (e.kc - (r.qc - 1) / 2) * spread;
+    const ey = a.y + (e.ka - (r.qa - 1) / 2) * Math.min(11, ra0 * 0.6);
+    const sx = c.x + cr(c) * (e.p < 1 ? 1 : CATION_SHRINK) * 0.98;
+    const ex = a.x - ar(a) * 0.98;
     electronDot(lerp(sx, ex, e.p), lerp(sy, ey, e.p) - Math.sin(e.p * Math.PI) * 26 * s, 4.5 * Math.max(.8, s), C.electron, 10);
   });
 
-  cats.forEach((c, i) => radioBurst(xc, c.y, cr(c), r.metal, t, i + 1));
-  ans.forEach((a, i) => radioBurst(xa, a.y, ar(a), r.nonmetal, t, i + 11));
+  cats.forEach((c, i) => radioBurst(c.x, c.y, cr(c), r.metal, t, i + 1));
+  ans.forEach((a, i) => radioBurst(a.x, a.y, ar(a), r.nonmetal, t, i + 11));
   const cap_ = ph < T0 ? '1 · Atomi neutri' : ph <= T1 ? '2 · Gli elettroni passano al non metallo' : '3 · Ioni di carica opposta si attraggono';
   text(cap_, 14, 18, 12, C.muted, 600, FONT_B, 'left');
   text('catione', xc, H - 3, 10, C.muted, 500, FONT_B, 'center', 'alphabetic');
@@ -1744,10 +1806,10 @@ function buildTable() {
     grid.appendChild(l);
   });
   [['57–71', 7], ['89–103', 8]].forEach(([t, row]) => {
-    const ph = document.createElement('div');
-    ph.className = 'el placeholder'; ph.textContent = t; ph.style.gridColumn = 4; ph.style.gridRow = row;
-    ph.setAttribute('aria-hidden', 'true');
-    grid.appendChild(ph);
+    const gap = document.createElement('div');
+    gap.className = 'el-gap'; gap.textContent = t; gap.style.gridColumn = 4; gap.style.gridRow = row;
+    gap.setAttribute('aria-hidden', 'true');
+    grid.appendChild(gap);
   });
   const ens = ELEMENTS.filter(e => e.en != null).map(e => e.en);
   const minEN = Math.min(...ens), maxEN = Math.max(...ens);
@@ -1755,10 +1817,11 @@ function buildTable() {
     const b = document.createElement('button');
     b.type = 'button';
     b.id = 'el-' + e.symbol;
-    b.className = 'el ' + e.type + (e.en == null ? ' noen' : '') + (e.radio ? ' radio' : '');
+    const pct = e.en != null ? Math.round(((e.en - minEN) / (maxEN - minEN)) * 100) : null;
+    b.className = 'el ' + e.type + (e.en == null ? ' noen' : '') + (e.radio ? ' radio' : '') + (pct != null && pct > 55 ? ' hot' : '');
     if (e.f) { b.style.gridColumn = (e.num - (e.f === 1 ? 57 : 89)) + 4; b.style.gridRow = e.f === 1 ? 10 : 11; }
     else { b.style.gridColumn = e.group + 1; b.style.gridRow = e.period + 1; }
-    if (e.en != null) b.style.setProperty('--heat', Math.round(((e.en - minEN) / (maxEN - minEN)) * 100) + '%');
+    if (pct != null) b.style.setProperty('--heat', pct + '%');
     b.setAttribute('aria-label', `${e.name}, numero atomico ${e.num}, elettronegatività ${enTxt(e)}${e.radio ? ', radioattivo' : ''}`);
     b.setAttribute('title', e.name + (e.radio ? ' ☢' : '') + ' — doppio clic: due atomi uguali');
     b.innerHTML = `<span class="top"><span>${e.num}</span><span>${e.en == null ? '–' : fmt(e.en)}</span></span><span class="sy">${e.symbol}</span><span class="nm">${e.name}</span>`;
@@ -1859,6 +1922,8 @@ function renderResult() {
     const zone = r.kind === 'ionico' ? 'ionico' : r.kind === 'polare' ? 'polare' : r.kind === 'apolare' ? 'apolare' : null;
     ['apolare', 'polare', 'ionico'].forEach(k => $('seg-' + k).classList.toggle('on', k === zone));
     if (r.kind === 'ionico' && r.dE <= 1.9) { note.textContent = 'Metallo + non metallo: legame ionico anche con ΔE sotto 1,9, con parziale carattere covalente.'; note.classList.remove('hidden'); }
+    else if (r.mixed) { note.textContent = `Metallo + non metallo con ΔE sotto ${fmt(IONIC_MIN_DE, 1)}${r.mixed.metalMore ? ' (e metallo più elettronegativo)' : ''}: il legame è soprattutto covalente.`; note.classList.remove('hidden'); }
+    else if (r.semicond) { note.textContent = 'Semiconduttore III-V: legame covalente nonostante la presenza di un metallo.'; note.classList.remove('hidden'); }
     else if (r.kind === 'metallico') { note.textContent = 'Tra metalli la regola del ΔE non decide: gli elettroni sono delocalizzati.'; note.classList.remove('hidden'); }
     else note.classList.add('hidden');
     if (r.kind === 'metallico') { $('ionic-val').textContent = '—'; $('ionic-bar').style.width = '0'; }
@@ -1960,6 +2025,7 @@ function describe(r) {
   if (r.kind === 'ionico') { d.structure = 'Reticolo ionico'; d.polarity = 'Ioni con cariche intere'; d.electrons = `${r.nc * r.qc} e⁻ trasferiti`; }
   else if (r.kind === 'metallico') { d.structure = 'Reticolo metallico'; d.polarity = '—'; d.electrons = 'Delocalizzati'; }
   else if (r.kind === 'nobile') { d.structure = 'Atomi isolati'; d.polarity = '—'; d.electrons = 'Nessuna interazione'; }
+  else if (r.semicond) { d.structure = 'Reticolo covalente tetraedrico'; d.polarity = cap(r.mol.polarity); d.electrons = '4 legami per atomo'; }
   else {
     const m = r.mol, pairs = m.two ? m.order : m.n * m.order;
     d.structure = m.two ? 'Lineare (due atomi)' : cap(m.geometry);
@@ -2000,7 +2066,7 @@ function updateCompare() {
     }
   }
   if (rA.mol && rB.mol && rA.mol.parts && rB.mol.parts && A.polarity !== B.polarity) {
-    out.push(`<p>Anche la polarità della molecola è diversa: ${lbl(rA)} è <strong>${lc(A.polarity)}</strong>, ${lbl(rB)} è <strong>${lc(B.polarity)}</strong>. Contano sia la ΔE dei legami sia la forma della molecola.</p>`);
+    out.push(`<p>Anche la polarità è diversa: ${lbl(rA)} è <strong>${lc(A.polarity)}</strong>, ${lbl(rB)} è <strong>${lc(B.polarity)}</strong>. Contano sia la ΔE dei legami sia la forma della molecola.</p>`);
   }
   $('cmp-summary').innerHTML = out.join('');
 }
@@ -2096,6 +2162,9 @@ const QUIZ_BANK = [
   { d: 3, q: 'Quale gas nobile tra questi può formare un composto con il fluoro?',
     o: ['Elio', 'Neon', 'Argon', 'Xeno'], c: 3, lab: ['Xe', 'F'],
     e: 'Gli atomi di xeno sono grandi e trattengono poco gli elettroni esterni: con il fluoro, il più elettronegativo, formano XeF₂ (molecola lineare con tre coppie solitarie sullo xeno).' },
+  { d: 3, q: 'Il gallio è un metallo, eppure in GaAs il legame è covalente. Perché?',
+    o: ['Perché l’arsenico cede elettroni al gallio', 'Perché ΔE è piccola (0,37) e ogni atomo condivide elettroni con 4 vicini, come nel silicio', 'Perché GaAs è una lega metallica', 'Perché il gallio è un gas nobile'], c: 1, lab: ['Ga', 'As'],
+    e: 'Con ΔE così piccola nessun elettrone passa davvero da un atomo all’altro: gallio (3 e⁻) e arsenico (5 e⁻) mettono in comune in media 4 elettroni per atomo e formano un reticolo tetraedrico. GaAs è un semiconduttore usato in LED e laser.' },
   { d: 1, q: 'Quale di questi elementi è radioattivo?',
     o: ['Sodio', 'Uranio', 'Ferro', 'Zinco'], c: 1, lab: ['U', 'U'],
     e: 'L’uranio ha solo isotopi instabili: il più comune, U-238, decade emettendo particelle α con un’emivita di circa 4,5 miliardi di anni.' },
@@ -2183,7 +2252,7 @@ function nextQuestion() {
 
 function bestScore(update) {
   try {
-    const key = 'bondlab-best-' + quiz.level;
+    const key = 'kimiklab-best-' + quiz.level;
     const old = parseInt(localStorage.getItem(key) || '0', 10) || 0;
     if (update > old) { localStorage.setItem(key, String(update)); return update; }
     return old;
@@ -2215,6 +2284,7 @@ function switchTab(tab) {
   TABS.forEach(t => {
     $('sec-' + t).classList.toggle('hidden', t !== tab);
     $('tab-' + t).setAttribute('aria-selected', String(t === tab));
+    $('tab-' + t).tabIndex = t === tab ? 0 : -1;
   });
   requestAnimationFrame(() => {
     if (tab === 'lab') sizeView(main);
@@ -2222,9 +2292,24 @@ function switchTab(tab) {
   });
 }
 
+// Navigazione tra le schede con le frecce (pattern ARIA tablist)
+function onTabKey(e) {
+  const cur = TABS.findIndex(t => $('tab-' + t).getAttribute('aria-selected') === 'true');
+  let n = null;
+  if (e.key === 'ArrowRight') n = (cur + 1) % TABS.length;
+  else if (e.key === 'ArrowLeft') n = (cur + TABS.length - 1) % TABS.length;
+  else if (e.key === 'Home') n = 0;
+  else if (e.key === 'End') n = TABS.length - 1;
+  if (n == null) return;
+  e.preventDefault();
+  switchTab(TABS[n]);
+  $('tab-' + TABS[n]).focus();
+}
+
 function init() {
   buildTable(); buildPresets(); buildCompare(); readTheme();
   TABS.forEach(t => $('tab-' + t).addEventListener('click', () => switchTab(t)));
+  document.querySelector('.tabs').addEventListener('keydown', onTabKey);
   $('slot-0').addEventListener('click', () => clearSlot(0));
   $('slot-1').addEventListener('click', () => clearSlot(1));
   $('btn-reset').addEventListener('click', resetBench);
@@ -2261,6 +2346,7 @@ function init() {
 
   document.addEventListener('keydown', e => {
     if ($('sec-quiz').classList.contains('hidden') || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target && e.target.getAttribute && e.target.getAttribute('role') === 'tab') return;
     const k = e.key.toLowerCase();
     const map = { '1': 0, '2': 1, '3': 2, '4': 3, a: 0, b: 1, c: 2, d: 3 };
     if (k in map && !quiz.answered && quiz.items[quiz.i] && map[k] < quiz.items[quiz.i].opts.length) answer(map[k]);
@@ -2269,7 +2355,8 @@ function init() {
 
   if (window.ResizeObserver) {
     new ResizeObserver(() => sizeView(main)).observe($('stage'));
-    new ResizeObserver(() => cmp.forEach(sizeView)).observe($('cmp-stage0'));
+    const ro = new ResizeObserver(() => cmp.forEach(sizeView));
+    ro.observe($('cmp-stage0')); ro.observe($('cmp-stage1'));
   }
   window.addEventListener('resize', () => { sizeView(main); cmp.forEach(sizeView); });
   const mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
